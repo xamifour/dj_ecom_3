@@ -1,0 +1,39 @@
+{% load currency_filters %}
+
+
+  <div class="">
+    <h2 class="h6 px-4 py-3 bg-secondary text-center">Subtotal</h2>
+    <div class="h3 font-weight-semibold text-center py-3">
+      <strong class="">
+        {% if request.basket.is_tax_known %}
+          {{ request.basket.total_incl_tax|currency:request.basket.currency }}
+        {% else %}
+          {{ request.basket.total_excl_tax|currency:request.basket.currency }}
+        {% endif %}
+      </strong>
+    </div>
+    <hr class="mb-5">
+  </div>
+
+
+<!--
+
+<h2 class="h6 px-4 py-3 bg-secondary text-center">Order summary</h2>
+<div class="font-size-sm border-bottom pt-2 pb-3">
+  <div class="d-flex justify-content-between mb-2"><span>Subtotal:</span>
+    <span>
+      {% if request.basket.is_tax_known %}
+        {{ request.basket.total_incl_tax|currency:request.basket.currency }}
+      {% else %}
+        {{ request.basket.total_excl_tax|currency:request.basket.currency }}
+      {% endif %}
+    </span>
+  </div>
+  <div class="d-flex justify-content-between mb-2"><span>Shipping:</span><span>&mdash;</span></div>
+  <div class="d-flex justify-content-between mb-2"><span>Taxes:</span><span>&mdash;</span></div>
+  <div class="d-flex justify-content-between"><span>Discount:</span><span>&mdash;</span></div>
+</div>
+<div class="h3 font-weight-semibold text-center py-3">${{order.get_order_total}}</div>
+
+
+-->

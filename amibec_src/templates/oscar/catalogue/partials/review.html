@@ -1,0 +1,64 @@
+{% load reviews_tags %}
+{% load i18n %}
+{% load static %}
+
+<div class="py-1">
+  <article class="review">
+    <header>
+      <h5 class="star-rating {{ review.score|as_stars }} font-size-sm">
+        <span>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+        </span>
+        <a class="ml-2" href="{{ review.get_absolute_url }}">{{ review.title }}</a>
+      </h5>
+    </header>
+
+    <h6 class="font-weight-semibold">{{ review.body|striptags }}</h6>
+
+    <small>
+      {% if review.user == user %}
+        {% blocktrans with review_date=review.date_created %}
+          Reviewed by <span class="font-weight-bold">you</span> on {{ review_date }}
+        {% endblocktrans %}
+      {% else %}
+        {% blocktrans with name=review.reviewer_name review_date=review.date_created %}
+          Reviewed by <strong>{{ name }}</strong> on {{ review_date }}
+        {% endblocktrans %}
+      {% endif %}
+      | <a href="{% url 'catalogue:reviews-detail' product_slug=product.slug product_pk=product.pk pk=review.pk %}">{% trans 'Permalink' %} - {{ review.user }}</a>
+    </small>
+    
+    {% if review|may_vote:user %}
+      <small>{% trans "Is this review helpful?" %}</small>
+      <div class="d-flex flex-wrap align-items-center pt-1">
+        <form action="{% url 'catalogue:reviews-vote' product_slug=product.slug product_pk=product.pk pk=review.pk %}" method="post" class="vote_agree" >
+          {% csrf_token %}
+          <input type="hidden" name="delta" value="1"/>
+          <button type="submit" class="btn btn-success btn-sm px-3" data-loading-text="{% trans 'Submitting...' %}">{% trans "Yes" %}</button>
+        </form>
+        <span class="ml-2"><form  action="{% url 'catalogue:reviews-vote' product_slug=product.slug product_pk=product.pk pk=review.pk %}" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="delta" value="-1"/>
+          <button type="submit" class="btn btn-danger btn-sm px-5" data-loading-text="{% trans 'Submitting...' %}">{% trans "No" %}</button>
+        </form></span>
+      </div>
+    {% endif %}
+    <p>
+      <small>
+      {% if review.has_votes %}
+        {% blocktrans with num_up_votes=review.num_up_votes count num_votes=review.total_votes %}
+        <strong>{{ num_up_votes }}</strong> of {{ num_votes }} customer found this useful
+        {% plural %}
+        <strong>{{ num_up_votes }}</strong> of {{ num_votes }} customers found this useful
+        {% endblocktrans %}
+      {% else %}
+        {% trans "This review has no votes." %}
+      {% endif %}
+      </small>
+    </p>
+  </article>    
+</div>

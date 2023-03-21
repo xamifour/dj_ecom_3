@@ -1,0 +1,49 @@
+{% load display_tags %}
+{% load i18n %}
+{% load image_tags %}
+{% load reviews_tags %}
+
+{% block product %}
+    <div class="product-card">
+        {% block product_image %}
+        <div class="product-thumb box-shadow-0">      
+            <span class="badge badge-danger rounded-0">0</span>
+            <a class="product-thumb-link" href="{{ product.get_absolute_url }}"></a>
+            <span class="product-wishlist-btn" data-toggle="tooltip" data-placement="left" title="Add to wishlist"><i data-feather="heart"></i></span>
+            <img height="160" width="160" class="mb-2" src="{{ product.primary_image.original.url }}" alt="{{ product.get_title }}">
+        </div>
+        {% endblock %}
+
+        <div class="product-card-body box-shadow-0">
+            <div class="d-flex flex-wrap justify-content-between pb-1">{% if item.sub_category %}
+                <a class="product-meta" href="#">{{item.get_sub_category}}</a>{% endif %}
+                <div class="star-rating"><span class="sr-label mr-1">
+                {% block product_review %}
+                    {% iffeature "reviews" %}
+                        <small class="star-rating {{ product.rating|as_stars }}">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </small>
+                    {% endiffeature %}
+                {% endblock %}
+                </div>
+            </div>
+
+            {% block product_title %}
+                <h3 class="product-card-title" style="font-size:15.5px !important;">
+                    <a href="{{ product.get_absolute_url }}" title="{{ product.get_title }}">
+                    {{ product.get_title|truncatewords:4 }}</a></h3>
+            {% endblock %}
+
+            <span class="f/ont-size-sm">                     
+                {% block product_price %}
+                    {% include "oscar/catalogue/partials/stock_record.html" %}
+                {% endblock %}
+            </span>
+
+        </div>
+    </div>
+{% endblock %}

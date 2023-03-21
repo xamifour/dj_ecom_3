@@ -1,0 +1,352 @@
+{% extends "oscar/layout.html" %}
+
+{% load history_tags %}
+{% load currency_filters %}
+{% load reviews_tags %}
+{% load product_tags %}
+{% load display_tags %}
+{% load i18n %}
+{% load purchase_info_tags %}
+
+{% block title %}
+{{ product.get_meta_title }} | {{ block.super }}
+{% endblock %}
+
+{% block description %}
+{{ product.get_meta_description }}
+{% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="{{ homepage_url }}">{% trans "Home" %}</a></li>
+  {% with category=product.get_categories.first %}
+    {% for c in category.get_ancestors_and_self %}
+        <li class="breadcrumb-item"><a href="{{ c.get_absolute_url }}">{{ c.name }}</a></li>
+    {% endfor %}
+    <li class="breadcrumb-item active" aria-current="page">{{ product.get_title }}</li>
+
+    {% get_back_button as backbutton %}
+      {% if backbutton %}
+        <li class="ml-auto">
+          <a href="{{ backbutton.url }}">
+            <i class="fas fa-arrow-left"></i> {{ backbutton.title }}
+          </a>
+        </li>
+      {% endif %}
+  {% endwith %}
+  </ol>
+</nav>
+{% endblock %}
+
+{% block header %}
+{% endblock header %}
+
+{% block content %}
+<article class="product_page"><!-- Start of product page -->
+
+  {% include 'oscar/products/product_review_form.html' %}
+  {% url 'customer:login' as customer_login_url %}
+  <!-- Size chart modal-->
+  {% include 'oscar/products/product_size_chart.html' %}
+
+  <div class="row">
+    {% block product_gallery %}
+      <div class="col-sm-6">
+        {% include "oscar/catalogue/partials/gallery.html" %}
+
+        <h2 class="h6 d-flex flex-wrap justify-content-between py-2"><span></span>
+          <a class="font-size-sm text-success" href="/"><i data-feather="chevron-left" style="width: 1rem; height: 1rem;"></i>Continue shopping</a>
+        </h2>      
+      </div>
+    {% endblock %}
+    {% block product_main %}
+    <div class="col-lg-6 pt-4 pt-lg-0 product_main">  
+      {% comment %}
+        This is a bit clunky here.  Better to have some kind of JS-driven dashboard menu that
+        pops out when clicked.  A bit like the Django-Debug-Toolbar button
+      {% endcomment %}
+      {% if user.is_staff %}
+        <a class="float-right d-none d-md-block" href="{% url 'dashboard:catalogue-product' pk=product.id %}">
+            <small><i class="fas fa-pencil-alt"></i> {% trans "Edit this product" %}</small>
+        </a>
+      {% endif %}
+      <h2 class="pt-1 h4" style="font-weight: 500;">{{ product.get_title }}</h2>
+
+      {% block product_stock_record %}
+        {% include "oscar/catalogue/partials/stock_record.html" with verbose=1 %}
+      {% endblock %}
+
+      {% iffeature "reviews" %}
+        {% include "oscar/catalogue/reviews/partials/review_stars.html" %}
+      {% endiffeature %}
+
+      <hr/>
+
+      <form class="pb-2">
+        <div class="form-group mb-1">
+          <label class="d-block">Choose color</label>
+          <div class="custom-control custom-option custom-control-inline mb-2">
+            <input class="custom-control-input" type="radio" name="color" value="dark" id="dark" required>
+            <label class="custom-option-label" for="dark"><span class="custom-option-color" style="background-color: #2c363f;"></span></label>
+          </div>
+          <div class="custom-control custom-option custom-control-inline mb-2">
+            <input class="custom-control-input" type="radio" name="color" value="red" id="red" required>
+            <label class="custom-option-label" for="red"><span class="custom-option-color" style="background-color: #e7484d;"></span></label>
+          </div>
+          <div class="custom-control custom-option custom-control-inline mb-2">
+            <input class="custom-control-input" type="radio" name="color" value="white" id="white" required>
+            <label class="custom-option-label" for="white"><span class="custom-option-color" style="background-color: #e0dfe4;"></span></label>
+          </div>
+          <div class="custom-control custom-option custom-control-inline mb-2">
+            <input class="custom-control-input" type="radio" name="color" value="beige" id="beige" required>
+            <label class="custom-option-label" for="beige"><span class="custom-option-color" style="background-color: #e6ddd6;"></span></label>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="pb-2 text-right"><span class="float-left">Available Stock: {{object.in_stock}}</span><a class="nav-link-inline font-size-sm" href="#size-chart" data-toggle="modal"><i class="align-bottom mr-1" data-feather="bar-chart-2"></i>Size chart</a></div>
+          <select class="form-control custom-select" id="size" name="size" required>
+            <option value>- Select a size</option>
+            {% for size in object.objects_list %}
+              <option value="13">{{size.size}}</option>
+            {% endfor %}
+            <option value="12">12</option>
+            <option value="11.5">11.5</option>
+            <option value="11">11</option>
+          </select>
+        </div>
+      </form>
+
+      {% if not product.is_parent %}
+      <div class="d-flex flex-wrap align-items-center pt-1">
+        <div>
+          <input class="px-2 form-control mr-2" type="number" id="id_quantity" name="quantity" style="width: 3.2rem;" value="1">
+        </div>
+        {% block product_basket_form %}
+          {% include "oscar/catalogue/partials/add_to_basket_form.html" %}
+        {% endblock %}
+      </div>
+      {% else %}
+        {% block variants %}
+            <h2 class="h4">{% trans 'Variants:' %}</h2>
+            {% for child in product.children.public %}
+                {% purchase_info_for_product request child as child_session %}
+                {% if child_session.availability.is_available_to_buy %}
+                    <a href="{{ child.get_absolute_url }}">{{ child.get_title }}</a><br>
+                {% endif %}
+            {% endfor %}
+        {% endblock %}
+      {% endif %}
+    </div><!-- /col-sm-6 -->
+    {% endblock %}
+
+  </div><!-- /row -->
+
+  {% block product_description %}
+    {% if product.description %}
+      <div id="product_description" class="">
+        <h2 class="h3" style="font-weight: 500;">{% trans "Product Description" %}</h2>
+      </div>
+      <p>{{ product.description|safe }}</p>
+    {% endif %}
+  {% endblock %}
+
+  {% block product_info %}
+    <!-- Product panels-->
+    <div class="accordion my-5" id="productPanels">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="accordion-heading"><a href="#productInfo" role="button" data-toggle="collapse" aria-expanded="true" aria-controls="productInfo"><span class="d-inline-block pr-2 border-right mr-2 align-middle mt-n1"><i data-feather="info" style="width: 1.1rem; height: 1.1rem;"></i></span>{% trans "Product Information" %}<span class="accordion-indicator"><i data-feather="chevron-up"></i></span></a></h3>
+        </div>
+        <div class="collapse show" id="productInfo" data-parent="#productPanels">
+          <div class="card-body">
+            <div class="mb-0">
+              <div class="table-responsive">
+                <table class="table table-sm table-hover table-bordered t/able-striped">
+                  {% if product.upc %}
+                  <tr>
+                    <th>{% trans "UPC" %}</th><td>{{ product.upc }}</td>
+                  </tr>
+                  {% endif %}
+                  <tr>
+                    <th>{% trans "Product Type" %}</th><td>{{ product.get_product_class.name }}</td>
+                  </tr>
+
+                  {% purchase_info_for_product request product as session %}
+                  {% if session.price.exists %}
+                  <tr>
+                    <th>{% trans "Price (excl. tax)" %}</th><td>{{ session.price.excl_tax|currency:session.price.currency }}</td>
+                  </tr>
+                  {% if session.price.is_tax_known %}
+                    <tr>
+                        <th>{% trans "Price (incl. tax)" %}</th><td>{{ session.price.incl_tax|currency:session.price.currency }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Tax" %}</th><td>{{ session.price.tax|currency:session.price.currency }}</td>
+                    </tr>
+                  {% endif %}
+                  <tr>
+                    <th>{% trans "Availability" %}</th>
+                    <td>{{ session.availability.message }}</td>
+                  </tr>
+                  {% endif %}
+                  {% for av in product.get_attribute_values %}
+                  <tr>
+                    <th>{{ av.attribute.name }}</th>
+                    <td>{{ av.value_as_html }}</td>
+                  </tr>
+                  {% endfor %}
+                  {% iffeature "reviews" %}
+                  <tr>
+                    <th>{% trans "Number of reviews" %}</th>
+                    <td>{{ product.num_approved_reviews }}</td>
+                  </tr>
+                  {% endiffeature %}
+                </table>
+              </div>              
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="accordion-heading"><a class="collapsed" href="#shippingOptions" role="button" data-toggle="collapse" aria-expanded="true" aria-controls="shippingOptions"><span class="d-inline-block pr-2 border-right mr-2 align-middle mt-n1"><i data-feather="truck" style="width: 1.1rem; height: 1.1rem;"></i></span>Shipping options<span class="accordion-indicator"><i data-feather="chevron-up"></i></span></a></h3>
+        </div>
+        <div class="collapse" id="shippingOptions" data-parent="#productPanels">
+          <div class="card-body">
+            <div class="d-flex justify-content-between border-bottom pb-2">
+              <div>
+                <div class="font-weight-semibold text-dark">Courier</div>
+                <div class="font-size-sm text-muted">2 - 4 days</div>
+              </div>
+              <div>$26.50</div>
+            </div>
+            <div class="d-flex justify-content-between border-bottom py-2">
+              <div>
+                <div class="font-weight-semibold text-dark">Local shipping</div>
+                <div class="font-size-sm text-muted">up to one week</div>
+              </div>
+              <div>${{object.shipping_in_city}}</div>
+            </div>
+            <div class="d-flex justify-content-between pt-2">
+              <div>
+                <div class="font-weight-semibold text-dark">Local pickup from store</div>
+                <div class="font-size-sm text-muted">&mdash;</div>
+              </div>
+              <div>${{object.shipping_out_country}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="accordion-heading"><a class="collapsed" href="#tagCloud" role="button" data-toggle="collapse" aria-expanded="true" aria-controls="tagCloud"><span class="d-inline-block pr-2 border-right mr-2 align-middle mt-n1"><i data-feather="tag" style="width: 1.1rem; height: 1.1rem;"></i></span>Tag cloud<span class="accordion-indicator"><i data-feather="chevron-up"></i></span></a></h3>
+        </div>
+        <div class="collapse" id="tagCloud" data-parent="#productPanels">
+          <div class="card-body"><a class="tag-link mr-2 mb-2" href="#">#sports shoes</a><a class="tag-link mr-2 mb-2" href="#">#men's shoes</a><a class="tag-link mr-2 mb-2" href="#">#sneakers</a><a class="tag-link mr-2 mb-2" href="#">#reebok classic</a><a class="tag-link mr-2 mb-2" href="#">#leather shoes</a><a class="tag-link mr-2 mb-2" href="#">#running</a><a class="tag-link mr-2 mb-2" href="#">#dark blue</a></div>
+        </div>
+      </div>
+    </div>
+  {% endblock %}
+
+  {% iffeature "reviews" %}
+    {% block product_review %}
+    <section class="mt-4">
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex justify-content-center align-items-end pt-2 pb-4">
+                <div class="display-4 mr-2">4.3</div>
+                <div>
+                  <div class="text-muted font-size-xs mb-n1">based on 295 reviews</div>
+                  <div class="star-rating"><i class="sr-star active" data-feather="star"></i><i class="sr-star active" data-feather="star"></i><i class="sr-star active" data-feather="star"></i><i class="sr-star active" data-feather="star"></i><i class="sr-star" data-feather="star"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="font-size-sm font-weight-semibold mb-2">5 stars - <span class="text-muted">177</span></div>
+              <div class="progress mb-3" style="height: 2px;">
+                <div class="progress-bar bg-warning" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+              <div class="font-size-sm font-weight-semibold mb-2">4 stars - <span class="text-muted">88</span></div>
+              <div class="progress mb-3" style="height: 2px;">
+                <div class="progress-bar bg-warning" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+              <div class="font-size-sm font-weight-semibold mb-2">3 stars - <span class="text-muted">20</span></div>
+              <div class="progress mb-3" style="height: 2px;">
+                <div class="progress-bar bg-warning" role="progressbar" style="width: 8%" aria-valuenow="8" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+              <div class="font-size-sm font-weight-semibold mb-2">2 stars - <span class="text-muted">9</span></div>
+              <div class="progress mb-3" style="height: 2px;">
+                <div class="progress-bar bg-warning" role="progressbar" style="width: 3%" aria-valuenow="3" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+              <div class="font-size-sm font-weight-semibold mb-2">1 star - <span class="text-muted">0</span></div>
+              <div class="progress mb-3" style="height: 2px;">
+                <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+              {% if request.user.is_authenticated %}
+                <div class="py-2"><a class="btn btn-warning btn-block" href="#leaveReview" data-toggle="modal">Leave a review</a></div>
+              {% else %}
+                <div class="py-2"><a class="btn btn-warning btn-block" href="{{customer_login_url}}">Sign in to submit a review</a></div>
+              {% endif %}
+            </div>
+          </div>       
+        </div>
+        <div class="col-md-8">
+          <div id="reviews" class="sub-header">
+            {% if product.num_approved_reviews > 3 %}
+              <a href="{% url 'catalogue:reviews-list' product_slug=product.slug product_pk=product.id %}" class="btn btn-outline-info float-right">{% trans "See all reviews" %}</a>
+            {% endif %}
+            <h2 class="h3 font-weight-semibold">{% trans "Customer Reviews" %}</h2>
+            <hr class="mb-3">
+          </div>
+
+          {% if product.num_approved_reviews == 0 %}
+            <p>
+              {% if product|is_review_permitted:user %}
+                {% url 'catalogue:reviews-add' product_slug=product.slug product_pk=product.id as add_review_url %}
+                    {% blocktrans %}This product does not have any reviews yet -
+                    <a href="{{ add_review_url }}#addreview">be the first to write one</a>.
+                {% endblocktrans %}
+              {% else %}
+                {% trans "This product does not have any reviews yet" %}.
+              {% endif %}
+            </p>
+          {% else %}
+            <ol class="list-unstyled review-list">
+              {% for review in product.reviews.approved.all|slice:":3" %}
+                <li>
+                {% include 'oscar/catalogue/partials/review.html' %}
+                </li>
+              {% endfor %}
+            </ol>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+    {% endblock product_review %}
+  {% endiffeature %}
+
+  {% with recommended_products=product.sorted_recommended_products|slice:":6" %}
+    {% if recommended_products %}
+    <div class="sub-header">
+      <h2 class="h3 font-weight-semibold">{% trans "Recommended items" %}</h2>
+    </div>
+    <ul class="row list-unstyled mx-0">
+      {% for product in recommended_products %}
+      <li class="col-sm-4 col-md-3 col-lg-3">
+        {% render_product product %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  {% endwith %}
+
+  {% recently_viewed_products current_product=product %}
+
+</article><!-- End of product page -->
+{% endblock content %}
+
+{% block extrascripts %}
+{{ block.super }}
+{% endblock %}

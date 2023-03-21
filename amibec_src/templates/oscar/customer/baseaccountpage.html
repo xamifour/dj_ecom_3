@@ -1,0 +1,47 @@
+{% extends "oscar/layout_2_col.html" %}
+
+{% load i18n %}
+
+{% block title %}
+    {{ page_title }} | {% trans 'Account' %} | {{ block.super }}
+{% endblock %}
+
+{% block body_class %}account-profile{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ homepage_url }}">{% trans 'Home' %}</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'customer:summary' %}">{% trans 'Account' %}</a>
+            </li>
+            {% block extra_breadcrumbs %}{% endblock %}
+            <li class="breadcrumb-item active" aria-current="page">{{ page_title }}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{% block headertext %}{{ page_title }}{% endblock %}
+
+{% block column_left %}
+    {% include 'oscar/customer/user_profile_aside.html' %}    
+{% endblock %}
+
+{% block head_title %}
+<div class="page-title-wrapper" aria-label="Page title">
+    <div class="container">
+        <h3 class="h4 font-weight-semibold">User Dashboard&nbsp;
+            <small class="text-muted font-size-lg">With links to user profile and more ...</small></h3>
+        <hr class="mt-2">
+    </div>
+</div>
+{% endblock %}
+{% block content %}
+    <div class="" data-aos="fade-up" data-aos-delay="200">
+        <div class="box">
+            {% block tabcontent %}{% endblock tabcontent %}
+        </div>
+    </div>
+{% endblock content %}

@@ -1,0 +1,18 @@
+{% load i18n %}
+{% load display_tags %}
+<a class="list-group-item list-group-item-action border-top-0 border-right-0 border-bottom-0 py-2 {% if active_tab == 'profile' %} active{% endif %}" href="{% url 'customer:profile-view' %}"><i class="text-muted" data-feather="chevron-right" style="width: .875rem; height: .875rem; margin-top: -.1rem; margin-right: .25rem;"></i><span>{% trans "Profile" %}</span>
+</a>
+<a class="list-group-item list-group-item-action border-top-0 border-right-0 border-bottom-0 py-2 {% if active_tab == 'orders' %} active{% endif %}" href="{% url 'customer:order-list' %}"><i class="text-muted" data-feather="chevron-right" style="width: .875rem; height: .875rem; margin-top: -.1rem; margin-right: .25rem;"></i><span>{% trans "Order History" %}</span>
+</a>
+<a class="list-group-item list-group-item-action border-top-0 border-right-0 border-bottom-0 py-2 {% if active_tab == 'addresses' %} active{% endif %}" href="{% url 'customer:address-list' %}"><i class="text-muted" data-feather="chevron-right" style="width: .875rem; height: .875rem; margin-top: -.1rem; margin-right: .25rem;"></i><span>{% trans "Address Book" %}</span>
+</a>
+<a class="list-group-item list-group-item-action border-top-0 border-right-0 border-bottom-0 py-2 {% if active_tab == 'emails' %} active{% endif %}" href="{% url 'customer:email-list' %}"><i class="text-muted" data-feather="chevron-right" style="width: .875rem; height: .875rem; margin-top: -.1rem; margin-right: .25rem;"></i><span>{% trans "Email History" %}</span>
+</a>
+<a class="list-group-item list-group-item-action border-top-0 border-right-0 border-bottom-0 py-2 {% if active_tab == 'alerts' %} active{% endif %}" href="{% url 'customer:alerts-list' %}"><i class="text-muted" data-feather="chevron-right" style="width: .875rem; height: .875rem; margin-top: -.1rem; margin-right: .25rem;"></i><span>{% trans "Product Alerts" %}</span>
+</a>
+<a class="list-group-item list-group-item-action border-top-0 border-right-0 border-bottom-0 py-2 {% if active_tab == 'notifications' %} active{% endif %}" href="{% url 'customer:notifications-inbox' %}"><i class="text-muted" data-feather="chevron-right" style="width: .875rem; height: .875rem; margin-top: -.1rem; margin-right: .25rem;"></i><span>{% trans "Notifications" %}</span>
+</a>
+{% iffeature 'wishlists' %}
+<a class="list-group-item list-group-item-action border-top-0 border-right-0 border-bottom-0 py-2 {% if active_tab == 'wishlists' %} active{% endif %}" href="{% url 'customer:wishlists-list' %}"><i class="text-muted" data-feather="chevron-right" style="width: .875rem; height: .875rem; margin-top: -.1rem; margin-right: .25rem;"></i><span>{% trans "Wish Lists" %}</span>
+</a>
+{% endiffeature %}

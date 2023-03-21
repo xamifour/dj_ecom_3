@@ -1,0 +1,424 @@
+{% load currency_filters %}
+{% load category_tags %}
+{% load history_tags %}
+{% load basket_tags %}
+{% load image_tags %}
+{% load i18n %}
+
+{% load static %}
+
+{% load account socialaccount %}
+
+{% url 'basket:summary' as cart_summary_url %}
+{% url 'checkout:index' as checkout_url %}
+{% url 'customer:logout' as customer_logout_url %}
+{% url 'customer:login' as customer_login_url %}
+{% url 'customer:summary' as customer_summary_url %}
+
+
+<!-- Off-canvas profile-->
+{% if request.user.is_authenticated %}
+<div class="offcanvas offcanvas-reverse" id="offcanvas-profile">
+  <div class="offcanvas-header d-flex justify-content-between align-items-center">
+    <h3 class="offcanvas-title"><a href="#">My Account</a></h3>
+    <button class="close" type="button" data-dismiss="offcanvas" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="offcanvas-body-inner">
+      <ul class="nav nav-tabs nav-justified" role="tablist">
+        <li class="nav-item"><a class="nav-link active" href="#myProfile" data-toggle="tab" role="tab"><i data-feather="log-in"></i>&nbsp;My Profile</a></li>
+        <li class="nav-item"><a class="nav-link" href="#userInfo" data-toggle="tab" role="tab"><i data-feather="user"></i>&nbsp;Info</a></li>
+      </ul>
+      <div class="tab-content pt-1">
+        <div class="tab-pane fade show active" id="myProfile" role="tabpanel">
+          <div class="p-4">
+            <h3 class="font-size-sm h6">{{user|capfirst}}</h3><span class="font-size-sm text-warning">{{user.email}}</span>
+          </div>
+          <li class="dropdown-divider"></li>
+          <a class="dropdown-item" href="{{customer_summary_url}}">
+            <div class="d-flex py-1"><i class="mt-1 ml-n2 text-info" data-feather="user" style="width: 1.375rem; height: 1.375rem;"></i>
+              <div class="ml-2"><span class="d-block mb-n1">Dashboard <span class='badge badge-pill badge-success'>40+</span></span><small class="text-muted">View Profile</small></div>
+            </div>
+          </a>
+          <li class="dropdown-divider"></li>
+          {% if user.is_staff or perms.partner.dashboard_access %}
+          <a href="{% url 'dashboard:index' %}" class="dropdown-item">
+            <div class="d-flex py-1">
+              <i class="mt-1 ml-n2" data-feather="edit" style="width: 1.375rem; height: 1.375rem;"></i>
+              <div class="ml-2"><span class="d-block mb-n1">{% trans "Admin" %} </span><small class="text-muted">View Admin Dashboard</div>
+            </div>
+          </a>
+          {% endif %}
+          <a class="dropdown-item" href="{{customer_logout_url}}">
+            <div class="d-flex py-1"><i class="mt-1 ml-n2 text-danger" data-feather="lock" style="width: 1.4375rem; height: 1.4375rem;"></i>
+              <div class="ml-2"><span class="d-block mb-n1">Logout</span><small class="text-muted">{{ user|capfirst }}</small></div>
+            </div>
+          </a>
+        </div>
+        <div class="tab-pane fade" id="userInfo" role="tabpanel">
+          <div class="pt-3 mr-3">
+            <div class="col-md-12 text-center">
+              <ul class="l/ist-group mb-3 z-depth-1">
+                <li class="list-group-item d-flex justify-content-between lh-condensed"><small> Registered:<br><span class="text-info">{{ user.date_joined }}</span></small></li>
+                <li class="list-group-item d-flex justify-content-between lh-condensed"><small> Last Login:<br>{{ user.last_login }}</small></li>
+                <li class="list-group-item d-flex justify-content-between lh-condensed"><small> Email:<br>{{ user.email }}</small></li>
+                <li class="list-group-item d-flex justify-content-between lh-condensed"><small> Phone:<br>{% if user.phone %}{{ user.phone }}{% endif %}</small></li>
+                <li class="list-group-item d-flex justify-content-between lh-condensed"><small> Address:<br>{{ user.address }}</small></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex align-items-center pt-5">
+        <hr class="w-100">
+        <div class="px-3 w-100 text-nowrap font-weight-semibold">You are logged in</div>
+        <hr class="w-100">
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Off-canvas account-->
+<div class="offcanvas offcanvas-reverse" id="offcanvas-account">
+  <div class="offcanvas-header d-flex justify-content-between align-items-center">
+    <h3 class="offcanvas-title"><a href="{{customer_login_url}}">Sign in</a> or <a href="{{customer_login_url}}">Create account</a></h3>
+    <button class="close" type="button" data-dismiss="offcanvas" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="offcanvas-body-inner">
+      <ul class="nav nav-tabs nav-justified" role="tablist">
+        <li class="nav-item"><a class="nav-link active" href="#signin" data-toggle="tab" role="tab"><i data-feather="log-in"></i>&nbsp;Sign In</a></li>
+        <li class="nav-item"><a class="nav-link" href="#signup" data-toggle="tab" role="tab"><i data-feather="user"></i>&nbsp;Sign Up</a></li>
+      </ul>
+      <div class="tab-content pt-1">
+        <div class="tab-pane fade show active" id="signin" role="tabpanel">
+          <form id="login_form" action="/accounts/login/" method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="form-group">
+              <label class="sr-only" for="id_login-username">Email</label>
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text" id="signin-email-icon"><i data-feather="mail"></i></span></div>
+                <input name="login-username" value="" class="form-control" type="email" id="id_login-username" placeholder="E-mail address" aria-label="Email" aria-describedby="signin-email-icon" required>
+                <div class="invalid-feedback">Please provide email address.</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="sr-only" for="id_login-password">Password</label>
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text" id="signin-password-icon"><i data-feather="lock"></i></span></div>
+                <input name="login-password" class="form-control" type="password" id="id_login-password" placeholder="Password" aria-label="Password" aria-describedby="signin-password-icon" required>
+                <div class="invalid-feedback">Please enter a password.</div>
+              </div>
+            </div>
+            <div class="custom-control custom-checkbox mb-3">
+              <input class="custom-control-input" type="checkbox" id="remember-me" checked>
+              <label class="custom-control-label" for="remember-me">Remember me</label>
+              <p><a class="custom-control-label" href="{% url 'password-reset' %}">{% trans "I've forgotten my password" %}</a></p>
+            </div>
+            <button name="login_submit" type="submit" value="Log In" class="btn btn-primary btn-block" data-loading-text="{% trans 'Logging in...' %}">{% trans 'Log In' %}</button>
+          </form>
+        </div>
+        <div class="tab-pane fade" id="signup" role="tabpanel">
+          <form id="register_form" action="/accounts/login/" method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <!--<div class="form-group">
+              <label class="sr-only" for="signup-name">Full name</label>
+              <input class="form-control" type="text" id="signup-name" placeholder="Full name" aria-label="Full name" required>
+              <div class="invalid-feedback">Please enter your full name.</div>
+            </div>-->
+            <div class="form-group">
+              <label class="sr-only" for="id_registration-email">Email address</label>
+              <input name="registration-email" class="form-control" type="email" id="id_registration-email" placeholder="E-mail address" aria-label="Email address" autocomplete="email" required>
+              <div class="invalid-feedback">Please provide a valid email address.</div>
+            </div>
+            <div class="form-group">
+              <label class="sr-only" for="id_registration-password1">Password</label>
+              <input name="registration-password1" class="form-control" type="password" id="id_registration-password1" placeholder="Password" aria-label="Password" autocomplete="new-password" required>
+              <div class="invalid-feedback">Please enter a password.</div>
+            </div>
+            <div class="form-group">
+              <label class="sr-only" for="id_registration-password2">Confirm password</label>
+              <input name="registration-password2" class="form-control" type="password" id="id_registration-password2" placeholder="Password (again)" aria-label="Confirm password" required>
+              <div class="invalid-feedback">Please confirm password.</div>
+            </div>
+            <button name="registration_submit" type="submit" value="Register" class="btn btn-primary btn-block" data-loading-text="{% trans 'Registering...' %}">{% trans 'Register' %}</button>
+          </form>
+        </div>
+      </div>
+      <div class="d-flex align-items-center text-center pt-5">
+        <hr class="w-100">
+        <div class="px-3 w-100 text-nowrap font-weight-semibold">Or sign in via</div>
+        <hr class="w-100">
+      </div>
+      <div class="text-center pt-4">
+        <a class="social-btn sb-facebook mx-2 mb-3" href="#" data-toggle="tooltip" title="Facebook"><i class="flaticon-facebook"></i></a>
+        <a class="social-btn sb-google-plus mx-2 mb-3" href="{% provider_login_url 'google' %}" data-toggle="tooltip" title="Google"><i class="flaticon-google-plus"></i></a>
+        <a class="social-btn sb-twitter mx-2 mb-3" href="#" data-toggle="tooltip" title="Twitter"><i class="flaticon-twitter"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Off-canvas cart-->
+<div class="offcanvas offcanvas-reverse" id="offcanvas-cart">
+  <div class="offcanvas-header d-flex justify-content-between align-items-center">
+    <h3 class="offcanvas-title"><a href="{{cart_summary_url}}">Your cart</a></h3>
+    <button class="close" type="button" data-dismiss="offcanvas" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="offcanvas-body-inner">
+      <div class="text-right"><a class="text-danger btn-sm pr-0" href="#"><i class="mr-1" data-feather="x" style="width: .85rem; height: .85rem;"></i>Clear cart</a></div>
+      <div class="widget widget-featured-entries pt-3">
+        {% if request.basket.num_lines %}
+          {% for line in request.basket.all_lines %}
+            <div class="media">
+              {% with image=line.product.primary_image %}
+                {% oscar_thumbnail image.original "100x100" upscale=False as thumb %}
+                <div class="featured-entry-thumb mr-3">
+                  <a href="{{ line.product.get_absolute_url }}">
+                    <img src="{{ thumb.url }}" alt="{{ line.product.get_title }}" class="img-thumbnail w-auto mx-auto my-0">
+                  </a><span class="item-remove-btn"><i data-feather="x"></i></span>
+                </div>
+              {% endwith %}
+              <div class="media-body">
+                <h6 class="featured-entry-title"><a href="{{ line.product.get_absolute_url }}">{{ line.quantity }} * {{ line.description }}</a></h6>
+                <p class="featured-entry-meta">{{ line.unit_price_excl_tax|currency:request.basket.currency }}</p>
+              </div>
+            </div>
+          {% endfor %}
+          <div class="card card-footer">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="font-size-sm"><span class="mr-2">{% trans "Cart Subtotal:" %}</span>
+                <span class="font-weight-semibold text-dark">
+                {% if request.basket.is_tax_known %}
+                  {{ request.basket.total_incl_tax|currency:request.basket.currency }}
+                {% else %}
+                  {{ request.basket.total_excl_tax|currency:request.basket.currency }}
+                {% endif %}
+                </span>
+              </div>
+              <a class="btn btn-light b/tn-sm" href="{{cart_summary_url}}">View cart<i class="mr-1" data-feather="chevron-right"></i></a>
+            </div>
+          </div>
+          <a class="btn btn-primary btn-sm btn-block" href="{{checkout_url}}"><i class="mr-1" data-feather="credit-card"></i>{% trans "Checkout" %}</a>
+        {% else %}
+          <p>{% trans "Your basket is empty." %}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Navbar Multilevel-->
+<!-- First line: Topbar-->
+<div class="navbar bg-dark py-1 px-0" style="">
+  <div class="container px-3">
+    <!-- contact info-->
+    <ul class="list-inline mb-0 d-none d-lg-inline-block">
+      <li class="list-inline-item opacity-75 mr-2"><i class="text-light mr-2" data-feather="phone" style="width: 13px; height: 13px;"></i><a class="text-light font-size-sm py-1 pl-0 pr-2" href="tel:00331697720">00 33 169 7720</a></li>
+      <li class="list-inline-item opacity-75 mr-2"><i class="text-light mr-2" data-feather="mail" style="width: 13px; height: 13px;"></i><a class="text-light font-size-sm py-1 pl-0 pr-2" href="mailto:info@example.com">info@amibec.com</a></li>
+    </ul>
+    <!-- links collapsed (moblie)-->
+    <div class="dropdown d-inline-block d-lg-none"><a class="dropdown-toggle text-light opacity-75 font-size-sm py-1" href="#" data-toggle="dropdown">Useful links</a>
+      <div class="dropdown-menu"><a class="dropdown-item" href="#">About us</a><a class="dropdown-item" href="#">Help center</a><a class="dropdown-item" href="#">Delivery info</a>
+        <div class="dropdown-divider"></div><a class="dropdown-item" href="tel:00331697720"><i class="mr-2" data-feather="phone" style="width: 13px; height: 13px;"></i>00 33 169 7720</a><a class="dropdown-item" href="mailto:info@example.com"><i class="mr-2" data-feather="mail" style="width: 13px; height: 13px;"></i>info@example.com</a>
+      </div>
+    </div>
+    <div class="d-flex">
+      <!-- topbar menu-->
+      <ul class="list-inline mb-0 d-none d-lg-block">
+        <li class="list-inline-item mr-2"><a class="text-light font-size-sm opacity-75 py-1 pl-0 pr-2 border-right border-light" href="#">About us</a></li>
+        <li class="list-inline-item mr-2"><a class="text-light font-size-sm opacity-75 py-1 pl-0 pr-2 border-right border-light" href="#">Help center</a></li>
+        <li class="list-inline-item mr-2"><a class="text-light font-size-sm opacity-75 py-1 pl-0 pr-2" href="#">Delivery info</a></li>
+      </ul>
+      <!-- social bar  -->
+      <div class="d-flex flex-nowrap"><a class="social-btn sb-facebook sb-light sb-sm ml-2" href="#"><i class="flaticon-facebook"></i><span class="sr-only">Facebook</span></a><a class="social-btn sb-twitter sb-light sb-sm ml-2" href="#"><i class="flaticon-twitter"></i><span class="sr-only">Twitter</span></a><a class="social-btn sb-instagram sb-light sb-sm ml-2" href="#"><i class="flaticon-instagram"></i><span class="sr-only">Instagram</span></a><a class="social-btn sb-pinterest sb-light sb-sm ml-2" href="#"><i class="flaticon-pinterest"></i><span class="sr-only">Pinterest</span></a></div>
+    </div>
+  </div>
+</div>
+<!-- Second line-->
+<header class="navbar navbar-expand-lg navbar-light bg-light px-0 f/ixed-top">
+  <div class="container flex-sm-nowrap px-3">
+    <!-- navbar brand-->
+    <!--<a class="navbar-brand mr-0 mr-sm-4" style="min-width: 100px;" href="/"><img width="100" src="{% static 'oscar/img/logo-dark.png' %}" alt="All Shops"/></a>-->
+    <a class="navbar-brand mr-0 mr-sm-4" href="{{ homepage_url }}">{% block brand_title %}{% trans 'amiBec' %}{% endblock %}</a><small>{{ shop_tagline }}</small>
+
+    <!-- navbar buttons-->
+    <div class="navbar-btns d-flex position-relative order-sm-3">
+      <div class="navbar-toggler navbar-btn collapsed bg-0 border-left-0 my-3" data-toggle="collapse" data-target="#menu"><i class="mx-auto mb-2" data-feather="menu"></i>Menu</div>
+      <a class="navbar-btn bg-0 my-3 border-left-0 navbar-collapse-hidden" href="{{product_comparison_url}}"><span class="d-block position-relative"><span class="navbar-btn-badge bg-secondary border">3</span><i class="mx-auto mb-1" data-feather="repeat"></i>Compare</span></a>
+
+      {% if not request.user.is_authenticated %}
+        <a class="navbar-btn bg-0 my-3" href="#offcanvas-account" data-toggle="offcanvas">
+          <i class="mx-auto mb-1" data-feather="log-in"></i>Sign In/Up
+        </a>
+      {% else %}
+        <a class="navbar-btn bg-0 my-3" href="#offcanvas-profile" data-toggle="offcanvas"><i class="mx-auto mb-1" data-feather="user"></i>Account</a>
+        <a class="navbar-btn bg-0 my-3" href="#offcanvas-cart" data-toggle="offcanvas">
+          <span class="d-block position-relative">
+            <span class="navbar-btn-badge bg-primary text-light">12</span><i class="mx-auto mb-1" data-feather="shopping-cart"></i>
+
+            {% if request.basket.is_tax_known %}
+              {{ request.basket.total_incl_tax|currency:request.basket.currency }}
+            {% else %}
+              {{ request.basket.total_excl_tax|currency:request.basket.currency }}
+            {% endif %}
+
+          </span>
+        </a>
+      {% endif %}
+    </div>
+    {% include "oscar/partials/search.html" %}
+  </div>
+</header>
+<!-- Third line: Navigation-->
+<div class="navbar navbar-expand-lg navbar-light bg-light px-0">
+  <div class="container px-3">
+    <!-- navbar collapse area-->
+    <div class="collapse navbar-collapse" id="menu">
+      <!-- language/currency switcher-->
+      <div class="navbar-lang-switcher dropdown pr-2">
+        <div class="dropdown-toggle" data-toggle="dropdown"><img width="20" src="{% static 'oscar/img/flags/en.png' %}" alt="English"/><span>USD</span>
+        </div>
+        <ul class="dropdown-menu dropdown-menu-left">
+          <li class="dropdown-item">
+            <select class="custom-select custom-select-sm">
+              <option value="usd">$ USD</option>
+              <option value="usd">€ EUR</option>
+              <option value="usd">£ UKP</option>
+              <option value="usd">¥ JPY</option>
+            </select>
+          </li>
+          <li><a class="dropdown-item" href="index.html"><img class="mr-2" width="20" src="{% static 'oscar/img/flags/fr.png' %}" alt="Français"/>Français</a></li>
+          <li class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="#"><img class="mr-2" width="20" src="{% static 'oscar/img/flags/de.png' %}" alt="Deutsch"/>Deutsch</a></li>
+          <li class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="#"><img class="mr-2" width="20" src="{% static 'oscar/img/flags/it.png' %}" alt="Italiano"/>Italiano</a></li>
+        </ul>
+      </div>
+      <!-- Site menu-->
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown mega-dropdown dropdown-more"><a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">Categories<i data-feather="more-horizontal"></i></a>
+          <div class="dropdown-menu">
+            <div class="dropdown-inner">
+
+              <div class="dropdown-column">
+                <div class="bg-position-center bg-no-repeat bg-size-cover text-center px-3 py-4 mb-3" style="background-image: url(oscar/img/megamenu/cat_bg02.jpg);">
+                  <h3 class="h5 text-white text-shadow my-3">Apparel</h3>
+                </div>
+                <div class="widget widget-links">
+                  <ul>
+                    {% category_tree depth=1 as tree_categories %}
+                    <!--<a class="dropdown-item" href="{% url 'catalogue:index' %}">{% trans "All products" %}</a>-->
+                      {% if tree_categories %}
+                        {% for tree_category in tree_categories %}
+                          <li><a href="{{ tree_category.get_absolute_url }}"><i class="widget-categories-indicator" data-feather="chevron-right"></i><span class="font-size-sm">{{ tree_category.name }}</span></a></li>
+                        {% endfor %}
+                      {% endif %}
+                    <div class="dropdown-divider"></div>
+                    {% block nav_dropdown_extra_items %}
+                        <a class="dropdown-item" href="{% url 'offer:list' %}">{% trans "Offers" %}</a>
+                    {% endblock %}
+                  </ul>
+                </div>
+              </div>
+
+              <div class="dropdown-column">
+                <div class="bg-position-center bg-no-repeat bg-size-cover text-center px-3 py-4 mb-3" style="background-image: url(oscar/img/megamenu/cat_bg01.jpg);">
+                  <h3 class="h5 text-white text-shadow my-3">Electronics</h3>
+                </div>
+                <div class="widget widget-links">
+                  <ul>
+                    <li><a href="#"><i class="widget-categories-indicator" data-feather="chevron-right"></i><span class="font-size-sm">Computers &amp; Accessories</span></a></li>
+                    <li><a href="#"><i class="widget-categories-indicator" data-feather="chevron-right"></i><span class="font-size-sm">TV, Video &amp; Audio</span></a></li>
+                    <li><a href="#"><i class="widget-categories-indicator" data-feather="chevron-right"></i><span class="font-size-sm">Smartphones &amp; Tablets</span></a></li>
+                    <li><a href="#"><i class="widget-categories-indicator" data-feather="chevron-right"></i><span class="font-size-sm">Cameras, Photo &amp; Video</span></a></li>
+                    <li><a href="#"><i class="widget-categories-indicator" data-feather="chevron-right"></i><span class="font-size-sm">Headphones</span></a></li>
+                    <li><a href="#"><i class="widget-categories-indicator" data-feather="chevron-right"></i><span class="font-size-sm">Wearable Electronics</span></a></li>
+                    <li><a href="#"><i class="widget-categories-indicator" data-feather="chevron-right"></i><span class="font-size-sm">Video Games</span></a></li>
+                  </ul>
+                </div>
+              </div>
+              <div class="dropdown-column">
+                <div class="bg-position-center bg-no-repeat bg-size-cover text-center px-3 py-4 mb-3" style="background-image: url(img/megamenu/cat_bg03.jpg);">
+                  <h3 class="h5 text-white text-shadow my-3">Furniture &amp; Decor</h3>
+                </div>
+                <div class="widget widget-links">
+                  <ul>
+                    <li><a href="#"><i class="widget-categories-indicator" data-feather="chevron-right"></i><span class="font-size-sm">Lounge Seating</span></a></li>
+                    <li><a href="#"><i class="widget-categories-indicator" data-feather="chevron-right"></i><span class="font-size-sm">File Cabinets</span></a></li>
+                    <li><a href="#"><i class="widget-categories-indicator" data-feather="chevron-right"></i><span class="font-size-sm">Tables</span></a></li>
+                    <li><a href="#"><i class="widget-categories-indicator" data-feather="chevron-right"></i><span class="font-size-sm">Indoor Lighting</span></a></li>
+                    <li><a href="#"><i class="widget-categories-indicator" data-feather="chevron-right"></i><span class="font-size-sm">Office Chairs</span></a></li>
+                    <li><a href="#"><i class="widget-categories-indicator" data-feather="chevron-right"></i><span class="font-size-sm">Adjustable Height Desks</span></a></li>
+                    <li><a href="#"><i class="widget-categories-indicator" data-feather="chevron-right"></i><span class="font-size-sm">Storage Units</span></a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item dropdown mega-dropdown active"><a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">Home</a>
+          <div class="dropdown-menu">
+            <div class="dropdown-inner"><a class="dropdown-column text-decoration-0" href="/"><img class="d-block img-thumbnail mb-2" src="{% static 'oscar/img/megamenu/home-apparel.jpg' %}" alt="Home">
+              <div class="text-center font-weight-semibold text-dark">Home</div>
+                <!--
+                </a><a class="dropdown-column text-decoration-0" href="#"><img class="d-block img-thumbnail mb-2" src="{% static 'oscar/img/megamenu/home-electronics.jpg' %}" alt="Home Electronics Store">
+                <div class="text-center font-weight-semibold text-dark">Home Electronics Store</div></a>
+                -->
+            </div>
+          </div>
+        </li>
+
+        <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+
+        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">Department</a>
+          <ul class="dropdown-menu">
+            <li class="dropdown">
+                {% category_tree depth=1 as tree_categories %}
+                {% if tree_categories %}
+                  {% for tree_category in tree_categories %}
+                    <a class="dropdown-item dropdown-toggle border-bottom" href="{{ tree_category.get_absolute_url }}" data-toggle="dropdown">{{ tree_category.name }}</a>
+                  {% endfor %}
+                {% endif %}
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Blog Right Sidebar</a></li>
+                <li class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#">Blog Left Sidebar</a></li>
+                <li class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#">Blog No Sidebar</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown"><i class="mr-1" data-feather="file-text"></i>Docs</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">
+                <div class="d-flex py-1"><i class="mt-1 ml-n2" data-feather="file-text" style="width: 1.4375rem; height: 1.4375rem;"></i>
+                  <div class="ml-2"><span class="d-block mb-n1">Documentation</span><small class="text-muted">Kick-start customization</small></div>
+                </div></a></li>
+            <li class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">
+                <div class="d-flex py-1"><i class="mt-1 ml-n2" data-feather="grid" style="width: 1.375rem; height: 1.375rem;"></i>
+                  <div class="ml-2"><span class="d-block mb-n1">Components <span class='badge badge-pill badge-success'>40+</span></span><small class="text-muted">Faster page building</small></div>
+                </div></a></li>
+            <li class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">
+                <div class="d-flex py-1"><i class="mt-1 ml-n2" data-feather="edit" style="width: 1.375rem; height: 1.375rem;"></i>
+                  <div class="ml-2"><span class="d-block mb-n1">Changelog <span class='badge badge-pill badge-warning'>v2.0</span></span><small class="text-muted">Regular updates</small></div>
+                </div></a></li>
+            <li class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">
+                <div class="d-flex py-1"><i class="mt-1 ml-n2" data-feather="life-buoy" style="width: 1.4375rem; height: 1.4375rem;"></i>
+                  <div class="ml-2"><span class="d-block mb-n1">Support</span><small class="text-muted">contact@studio</small></div>
+                </div></a></li>
+          </ul>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</div>

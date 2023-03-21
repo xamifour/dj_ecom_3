@@ -1,0 +1,129 @@
+{% extends "oscar/checkout/checkout.html" %}
+{% load i18n %}
+{% load static %}
+{% load currency_filters %}
+
+{% block title %}
+{% trans "Shipping address" %} | {{ block.super }}
+{% endblock %}
+
+{% block checkout_nav %}
+  {% include 'oscar/checkout/nav.html' with step=1 %}
+{% endblock %}
+
+{% block checkout_title %}{% trans "Shipping address" %}{% endblock %}
+
+{% block order_contents %}{% endblock %}
+
+
+
+{% block shipping_address %}
+
+<div class="row pt-4">
+  <div class="col-xl-9 col-md-8">
+    {% if user.is_authenticated %}
+      {% if addresses %}
+        {% for address in addresses %}
+          {% block select_address_form %}
+          <div class="">
+            <div class="d-sm-flex justify-content-between bg-secondary px-4 py-3 mb-4">
+              <div class="media"><img class="img-thumbnail rounded-circle mr-3" src="{% static 'oscar/img/account/customer.jpg' %}" width="95" alt="Daniel Adams">
+                <div class="media-body align-self-center">
+                  <h6 class="mb-1">{{user|capfirst}}</h6>
+                  <div class="font-size-sm"><span class="text-warning">{{user.email}}</span></div>
+                  <div class="font-size-sm opacity-75"><span class="mr-1">Reward points:</span><span class="font-weight-semibold">586</span></div>
+                  <div class="font-size-sm opacity-75"><span class="mr-1">
+                    <address>
+                      {% block select_address_fields %}
+                        {% for field in address.active_address_fields %}
+                          <span>{{ field }}</span>{% if not forloop.first %}<br/>{% endif %}
+                        {% endfor %}
+                      {% endblock %}
+                  </address></span>
+                  </div>
+                </div>
+              </div>
+              <div class="pt-3 pl-sm-2 text-right">
+                <form action="{% url 'checkout:shipping-address' %}" method="post" id="select_shipping_address_{{ address.id }}" class="mb-0">
+                {% csrf_token %}
+                  <input type="hidden" name="action" value="ship_to" />
+                  <input type="hidden" name="address_id" value="{{ address.id }}" />
+                  {% if address.is_default_for_shipping %}
+                    <button type="submit" class="btn btn-success btn-large ship-address" data-loading-text="{% trans 'Saving...' %}"><i class="fas fa-check-circle"></i> {% trans "Ship to your default shipping address" %}</button>
+                  {% else %}
+                    <button type="submit" class="btn btn-primary btn-large ship-address" data-loading-text="{% trans 'Saving...' %}">{% trans "Ship to this address" %}</button>
+                  {% endif %}
+
+                  <div class="btn-group address-controls">
+                    <a href="{% url 'checkout:user-address-update' pk=address.id %}" class="btn btn-light"><i class="mr-2" data-feather="edit"></i>{% trans "Edit address" %}</a>
+                    <button class="btn btn-outline-danger dropdown-toggle" data-toggle="dropdown"></button>
+                    <ul class="dropdown-menu">
+                      <a href="{% url 'checkout:user-address-delete' pk=address.id %}" class="btn-remove-address nav-link btn btn-outline-danger">{% trans "Delete" %}</a>
+                    </ul>
+                  </div>
+                </form>
+                </div>
+              </div>
+            </div>
+              {% if forloop.counter|divisibleby:2 %} {% endif %}
+          {% endblock %}
+        {% endfor %} 
+      {% endif %}
+    {% endif %}
+
+    {% block new_address_form %}
+    <div class="fadeIn card mt-4">
+      <div class="card-header">
+        <h3 class="h5 font-weight-semibold">{% trans "Or use new address?" %}</h3>
+      </div>
+      <div class="card-body bg-light">
+        <form action="{% url 'checkout:shipping-address' %}" method="post" id="new_shipping_address">
+          {% csrf_token %}
+          {% include "oscar/partials/form_fields.html" with form=form style='horizontal' %}
+          <div class="form-group row">
+            <div class="offset-sm-4 col-sm-8">
+              <button type="submit" class="btn btn-lg btn-primary" data-loading-text="{% trans 'Continuing...' %}">{% trans "Continue" %}<i class="ml-1" data-feather="chevron-right"></i></button>
+                {% trans "or" %} <a href="{% url 'basket:summary' %}">{% trans "return to basket" %}</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    {% endblock %}
+  </div>
+
+  <!-- Right Sidebar-->
+  <div class="col-xl-3 col-md-4 pt-4 mt-3 pt-md-0 mt-md-0">
+     
+    {% include "oscar/basket/partials/order_items_summary_total.html" %}
+    {% include "oscar/basket/partials/order_items_summary.html" %}
+    <!-- Promo banner -->
+    <a class="d-block text-decoration-0 mt-4 mx-auto pt-2" href="#" s/tyle="max-width: 277px;">
+      <div class="bg-secondary">
+        <div class="px-3 pt-4 text-center">
+          <h4 class="font-size-sm font-weight-normal pt-1 mb-2">2021 Spring / Summer</h4>
+          <h4 class="h5 pb-2">Hoodie Collection</h4>
+          <div class="btn btn-primary btn-sm">Shop now</div>
+        </div><img src="{% static '/oscar/img/shop/banner01.jpg' %}" alt="Promo banner">
+      </div>
+    </a>
+
+    <a class="d-block text-decoration-0 mt-4 mx-auto pt-2" href="#" style="max-width: 277px;">
+      <div class="bg-secondary">
+        <div class="px-3 pt-4 text-center">
+          <h4 class="font-size-sm font-weight-normal pt-1 mb-2">2021 Spring / Summer</h4>
+          <h4 class="h5 pb-2">New Collection</h4>
+          <div class="btn btn-primary btn-sm">Shop now</div>
+        </div><img src="{% static '/oscar/img/shop/iphone_13_1.jpg' %}" alt="Promo banner">
+      </div>
+    </a>
+  </div>
+
+</div>
+{% endblock shipping_address %}
+
+
+
+
+{% block shipping_method %}{% endblock %}
+{% block payment_method %}{% endblock %}

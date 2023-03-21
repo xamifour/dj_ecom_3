@@ -1,0 +1,45 @@
+{% load i18n %}
+{% load category_tags %}
+
+{% url 'search:search' as product_query_url %}
+
+  <div class="flex-grow-1 pb-3 pt-sm-3 my-1 px-sm-2 pr-lg-4 order-sm-2">
+    <form method='GET' action='{{product_query_url}}' class="search-form" >
+      <div class="input-group flex-nowrap">
+        <div class="input-group-prepend"><button type="submit" class="input-group-text rounded-left bg-primary" id="search-icon"><i style="color:white;" data-feather="search"></i></button></div>
+        <input class="form-control rounded-right" name='q' value='' type="text" id="site-search" placeholder="Search product" aria-label="Search site" aria-describedby="search-icon">
+      </div>
+    </form>
+  </div>
+  <!-- search-box
+  <div class="main-menu-search flex-grow-1 pb-3 pt-sm-3 my-1 px-sm-2 pr-lg-4 order-sm-2">
+    <form method='GET' action='{{product_query_url}}' class="search-/form" >
+      <div class="navbar-search search-style-5">
+        <div class="search-select" style="max-width: 40%;">
+          <div class="select-position">
+            <select id="select10">
+              <option selected class="">All</option>
+              {% category_tree depth=1 as tree_categories %}
+                {% if tree_categories %}
+                  {% for tree_category in tree_categories %}
+                    <option value="{{ tree_category.name }}"><a href="{{ tree_category.get_absolute_url }}">{{ tree_category.name }}</a></option>
+                  {% endfor %}
+                {% endif %}
+            </select>
+          </div>
+        </div>
+        <div class="search-input">
+          <input type="text" name='q' aria-label="Search" value='{{ request.GET.q }}' placeholder="{% trans 'Search ...' %}.">
+        </div>
+        <div class="search-btn">
+          <button><i data-feather="search"></i></button>
+        </div>
+      </div>
+    </form>
+  </div>-->
+<!--
+<form class="form-inline my-2 my-lg-0" method="GET" action="{% url 'search:search' %}">
+  <input class="form-control mr-sm-2" name="q" placeholder="Search" aria-label="Search">
+  <button class="btn btn btn-secondary my-2 my-sm-0" type="submit">{% trans "Search" %}</button>
+</form>
+-->

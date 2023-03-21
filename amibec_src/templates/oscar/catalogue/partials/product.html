@@ -1,0 +1,59 @@
+{% load display_tags %}
+{% load i18n %}
+{% load image_tags %}
+{% load reviews_tags %}
+
+{% block product %}
+    <div class="product-card">
+        {% block product_image %}
+            <div class="product-thumb">
+                <a class="product-thumb-link" href="{{ product.get_absolute_url }}"></a>
+                <span class="badge badge-danger rounded-0">01</span>
+                <span class="product-wishlist-btn" data-toggle="tooltip" data-placement="left" title="Add to wishlist"><i data-feather="heart"></i></span>
+                <img src="{{ product.primary_image.original.url }}" alt="{{ product.get_title }}">
+            </div>        
+        {% endblock %}
+
+        <div class="product-card-body">
+            <div class="d-flex flex-wrap justify-content-between pb-1">
+                <a class="product-meta" href="#">category</a>
+                <div class="star-rating"><span class="sr-label mr-1">4.2</span><i class="sr-star active" data-feather="star"></i></div>
+            </div>
+
+            {% block product_review %}
+                {% iffeature "reviews" %}
+                    <small class="star-rating {{ product.rating|as_stars }}">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </small>
+                {% endiffeature %}
+            {% endblock %}
+
+            {% block product_title %}
+                <h3 class="product-card-title">
+                    <a href="{{ product.get_absolute_url }}" title="{{ product.get_title }}">
+                        {{ product.get_title|truncatewords:4 }}
+                    </a>
+                </h3>
+            {% endblock %}
+
+            <div class="text-primary">         
+                {% block product_price %}
+                    {% include "oscar/catalogue/partials/stock_record.html" %}
+                {% endblock %}
+            </div>
+        </div>
+        <div class="product-card-body body-hidden p/t-2">
+            {% if not product.is_parent and not product.has_options %}
+                {% include "oscar/catalogue/partials/add_to_basket_form_compact.html" %}                
+                <a class="quick-view-btn" href="#" data-toggle="toast" data-target="#compare-toast"><i class="mr-1" data-feather="repeat"></i>Compare</a>
+            {% endif %}
+            <ul class="font-size-sm opacity-80 pl-4 p/t-2 mb-2">
+                {{ product.get_title|truncatechars:10 }}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

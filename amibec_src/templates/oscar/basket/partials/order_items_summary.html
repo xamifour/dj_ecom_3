@@ -1,0 +1,34 @@
+{% load currency_filters %}
+{% load i18n %}
+
+<div class="mb-4">
+  <h5 class="d-flex justify-content-between align-items-center mb-3">
+    <span class=""><i class="mx-auto mb-1" data-feather="shopping-cart"></i></span>
+    <span class="badge badge-success badge-pill">3</span>
+  </h5>
+  {{ order.items.count }} Distinct Item(s) - Total Qty: {{order.get_total_qty_buying}}
+  <ul class="list-group mb-3 z-depth-1">
+    {% if request.basket.num_lines %}
+      {% for line in request.basket.all_lines %}
+      <li class="list-group-item d-flex justify-content-between lh-condensed">
+        <small class="text-muted">{{ line.quantity }} * {{ line.description }}</small> 
+        <span class="font-size-sm">{{ line.unit_price_excl_tax|currency:request.basket.currency }}</span>
+      </li>
+      {% endfor %}
+      <li class="list-group-item d-flex justify-content-between">
+        <span>Total</span>
+        <strong class="text-danger">
+          {% if request.basket.is_tax_known %}
+            {{ request.basket.total_incl_tax|currency:request.basket.currency }}
+          {% else %}
+            {{ request.basket.total_excl_tax|currency:request.basket.currency }}
+          {% endif %}
+        </strong>
+      </li>
+    {% else %}
+       <p>{% trans "Your basket is empty." %}</p>
+    {% endif %}
+  </ul>
+
+</div>
+

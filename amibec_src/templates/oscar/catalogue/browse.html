@@ -1,0 +1,80 @@
+{% extends "oscar/layout.html" %}
+
+{% load product_tags %}
+{% load i18n %}
+
+
+{% load display_tags %}
+{% load image_tags %}
+{% load reviews_tags %}
+
+
+{% block title %}
+    {% if summary %}{{ summary }} |{% endif %} {{ block.super }}
+{% endblock %}
+
+{# block headertext %}{{ summary }}{% endblock #}
+<!--
+{# block breadcrumbs #}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ homepage_url }}">{% trans "Home" %}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ summary }}</li>
+        </ol>
+    </nav>
+{# endblock breadcrumbs #}
+-->
+
+{% block content %}
+
+    {% block pre_content %}
+        {% include 'oscar/catalogue/partials/product_slider.html' %}
+    {% endblock %}
+    {% if products %}
+        <section>         
+            <!-- Featured Products -->
+            <div class="featured-products">
+                <h2 class="h4 font-weight-semibold">Featured Products</h2>
+                <div class="owl-carousel" data-owl-carousel="{ &quot;nav&quot;: false, &quot;dots&quot;: true, &quot;loop&quot;: true, &quot;margin&quot;: 15, &quot;responsive&quot;: {&quot;0&quot;:{&quot;items&quot;:1},&quot;360&quot;:{&quot;items&quot;:2}, &quot;630&quot;:{&quot;items&quot;:3}, &quot;850&quot;:{&quot;items&quot;:4}, &quot;1200&quot;:{&quot;items&quot;:7}} }">
+
+                {% for product in products %}
+                    {% render_product product %}
+                {% endfor %}    
+                </div>
+            </div>
+            
+                {% for product in products %}
+                    {{ product.title }}
+                    {% block product %}
+                        {{ product.primary_image.original.url }}    
+                        {{ product.image.original.url }}
+                    {% endblock %}
+                    {{product.upc}}
+                    {% block product_review %}
+                        {% iffeature "reviews" %}
+                            <small class="star-rating {{ product.rating|as_stars }}">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </small>
+                        {% endiffeature %}
+                    {% endblock %}
+
+                {% endfor %} 
+
+            <div class="pagination">
+                {% include "oscar/partials/pagination.html" %}
+            </div>
+        </section>
+    {% else %}
+        <p class="nonefound">{% trans "No products found." %}</p>
+    {% endif %}
+
+{% endblock content %}
+
+{% block onbodyload %}
+    {{ block.super }}
+    oscar.search.init();
+{% endblock %}

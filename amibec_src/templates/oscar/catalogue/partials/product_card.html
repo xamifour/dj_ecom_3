@@ -1,0 +1,58 @@
+{% load currency_filters %}
+{% load i18n %}
+<!-- Related products-->
+<div class="container pb-5">
+  <h2 class="h4 pb-4 font-weight-semibold">Featured Products</h2>
+  <div class="owl-carousel" data-owl-carousel="{ &quot;nav&quot;: false, &quot;dots&quot;: true, &quot;loop&quot;: true, &quot;margin&quot;: 15, &quot;responsive&quot;: {&quot;0&quot;:{&quot;items&quot;:1},&quot;360&quot;:{&quot;items&quot;:2}, &quot;630&quot;:{&quot;items&quot;:3}, &quot;850&quot;:{&quot;items&quot;:4}, &quot;1200&quot;:{&quot;items&quot;:7}} }">
+
+    {% for product in products %}
+    <div class="product-card">
+      <div class="product-thumb box-shadow-0">
+        {% if item.get_discount %}
+          <span class="badge badge-danger rounded-0">{{ item.get_discount }}</span>
+        {% endif %}
+
+          {{ form.id }}
+          {% with image=product.primary_image %}
+          <a href="{{ product.get_absolute_url }}" class="product-thumb-link">
+            <img class="img-thumbnail w-auto mx-auto my-0" src="{{ image.original.url }}" alt="{{ product.get_title }}"/>
+          </a>
+          {% endwith %}
+
+        <span class="product-wishlist-btn" data-toggle="tooltip" data-placement="left" title="Add to wishlist"><i data-feather="heart"></i></span>
+        <img height="160" width="160" class="mb-2" src="{{ item.img1.url }}" alt="Product Image">
+      </div>
+      <div class="p/roduct-card-body box-shadow-0">
+        <div class="d-flex flex-wrap justify-content-between pb-1">{% if item.sub_category %}<a class="product-meta" href="#">{{item.get_sub_category}}</a>{% endif %}
+          <div class="star-rating"><span class="sr-label mr-1">3.9</span><i class="sr-star active" data-feather="star"></i></div>
+        </div>
+
+        {% if product.description %}
+        <div id="product_description" class="product-card-title">
+          <h3 class="h6" style="font-weight: 500;">{{ product.description|truncatechars:80 }}</h3>
+        </div>
+        {% endif %}
+
+        <span class="text-primary">
+          <h2 class="h6 font-weight-semibold p/t-3 pb-2">
+           
+{% if session.price.exists %}
+    {% if session.price.excl_tax == 0 %}
+        <h4 class="price_color">{% trans "Free" %}</h4>
+    {% elif session.price.is_tax_known %}
+        <h4 class="price_color">{{ session.price.incl_tax|currency:session.price.currency }}</h4>
+    {% else %}
+        <h4 class="price_color">{{ session.price.excl_tax|currency:session.price.currency }}</h4>
+    {% endif %}
+{% else %}
+    <p class="price_color">&nbsp;</p>
+{% endif %}
+          </h2>
+        </span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+

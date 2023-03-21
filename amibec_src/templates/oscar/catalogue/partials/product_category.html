@@ -1,0 +1,69 @@
+
+{% load category_tags %}
+{% load i18n %}
+
+
+<!-- Shop sidebar-->
+<div class="offcanvas-sidebar">
+  <div class="offcanvas-sidebar-toggle"><span class="toggle-knob"><i data-feather="chevrons-right"></i>Sidebar</span></div>
+  <div class="offcanvas-sidebar-body">
+    <div class="offcanvas-sidebar-body-inner">
+      <!-- Categories-->
+      <div class="mb-4 py-1"><h3 class="widget-title">Product categories</h3>
+        <div class="border px-2 py-2 b/order-success">
+          <ul class="list-unstyled mb-0 " id="shopCategories">
+
+            {% category_tree as tree_categories %}
+            {% if tree_categories %}
+              {% for tree_category in tree_categories %}
+              <li class="border-bottom">
+                <a class="d-flex align-items-center nav-link-inline py-3" href="{{ tree_category.get_absolute_url }}" data-toggle="popover" data-placement="right" data-trigger="hover" data-html="true" data-content="&lt;img src=&quot;/oscar/img/shop/electronics/categories/02.jpg&quot; class=&quot;d-block mt-n2&quot; alt=&quot;TV, Video &amp; Audio&quot;&gt;&lt;div class=&quot;text-center font-size-sm font-weight-semibold pb-3&quot;&gt;Starting from $78.00&lt;/div&gt;">
+
+                  <i class="text-primary opacity-60 mr-2 mt-1" data-feather="monitor" style="width: 1.25rem; height: 1.25rem;"></i>
+                  <span>{{ tree_category.name }}<i class="ml-1" data-feather="chevron-right" style="width: 1rem; height: 1rem;"></i></span>
+                </a>
+              </li>
+              {% endfor %}
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+
+
+    {% category_tree as tree_categories %}
+    {% if tree_categories %}
+        <h4>{% trans "Show results for" %}</h4>
+        <div class="side_categories card card-body bg-light">
+            <ul class="nav nav-list flex-column">
+                {% for tree_category in tree_categories %}
+                    <li class="mt-2">
+                        <a href="{{ tree_category.url }}">
+                            {% if tree_category.pk == category.pk %}
+                                <strong>{{ tree_category.name }}</strong>
+                            {% else %}
+                                {{ tree_category.name }}
+                            {% endif %}
+                        </a>
+
+                        {% if tree_category.has_children %}<ul>{% else %}</li>{% endif %}
+                        {% for n in tree_category.num_to_close %}
+                            </ul></li>
+                        {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% if has_facets %}
+        <h4>{% trans "Refine by" %}</h4>
+        <div class="side_categories card card-body bg-light">
+            {% for field, data in facet_data.items %}
+                {% if data.results %}
+                    {% include 'oscar/search/partials/facet.html' with name=data.name items=data.results %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    </div>
+  </div>
+</div>

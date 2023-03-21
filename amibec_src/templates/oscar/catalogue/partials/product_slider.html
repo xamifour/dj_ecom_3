@@ -1,0 +1,102 @@
+{% load static %}
+
+
+<!-- slide show-->
+<section class="py-4">
+  <div class="row">
+    <div class="col-lg-8">
+      <!-- Hero slider-->
+      <div class="bg-secondary bg-size-cover mb-grid-gutter" style="background-image: url(/oscar/img/home/electronics/hero-main-bg.jpg);">
+        <div class="owl-carousel trigger-carousel" data-owl-carousel="{ &quot;nav&quot;: true, &quot;dots&quot;: false, &quot;loop&quot;: true, &quot;autoHeight&quot;: true, &quot;autoplay&quot;: true, &quot;autoplayTimeout&quot;: 5500 }">
+          <div class="row align-items-center py-5">
+            <div class="col-md-5">
+              <div class="pl-3 pr-3 pl-md-5 pr-md-0 pt-4 pt-lg-5 pb-5 text-center text-md-left">
+                <h3 class="mb-1">Google Home Smart Speaker</h3>
+                <h4 class="font-weight-light opacity-70 pb-3">starting at $129.00</h4><a class="btn btn-primary" href="#">Shop now<i class="ml-2" data-feather="arrow-right"></i></a>
+              </div>
+            </div>
+            <div class="col-md-7"><img class="d-block mx-auto" src="{% static 'oscar/img/home/electronics/hero-slide01.png' %}" alt="Smart Speaker"></div>
+          </div>
+          <div class="row align-items-center py-5">
+            <div class="col-md-5">
+              <div class="pl-3 pr-3 pl-md-5 pr-md-0 pt-4 pt-lg-5 pb-5 text-center text-md-left">
+                <h3 class="mb-1">Modern Powerful Vaio Laptop</h3>
+                <h4 class="font-weight-light opacity-70 pb-3">for only $1,459.99</h4><a class="btn btn-primary" href="#">Shop now<i class="ml-2" data-feather="arrow-right"></i></a>
+              </div>
+            </div>
+            <div class="col-md-7"><img class="d-block mx-auto" src="{% static 'oscar/img/home/electronics/hero-slide02.png' %}" alt="Vaio Laptop"></div>
+          </div>
+          <div class="row align-items-center py-5">
+            <div class="col-md-5">
+              <div class="pl-3 pr-3 pl-md-5 pr-md-0 pt-4 pt-lg-5 pb-5 text-center text-md-left">
+                <h3 class="mb-1">Wireless Beats Studio by Dr.Dre</h3>
+                <h4 class="font-weight-light opacity-70 pb-3">starting at $349.50</h4><a class="btn btn-primary" href="#">Shop now<i class="ml-2" data-feather="arrow-right"></i></a>
+              </div>
+            </div>
+            <div class="col-md-7"><img class="d-block mx-auto" src="{% static 'oscar/img/home/electronics/hero-slide03.png' %}" alt="Wireless Beats"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <a class="media align-items-center bg-faded-info text-decoration-0" href="#"><img class="mr-1" src="{% static 'oscar/img/home/electronics/banner-sm01.png' %}" width="125" alt="Banner">
+      <div class="media-body py-2 pr-2">
+        <h5 class="text-body mb-1"><span class="font-weight-light">Next Gen <strong>Video</strong> with <strong>360 Cam</strong></span></h5><span class="text-info font-size-sm font-weight-semibold">Shop now<i data-feather="chevron-right" style="width: 1rem; height: 1rem;"></i></span>
+      </div></a><a class="media align-items-center bg-faded-warning text-decoration-0" href="#"><img class="mr-1" src="{% static 'oscar/img/home/electronics/banner-sm02.png' %}" width="125" alt="Banner">
+      <div class="media-body py-2 pr-2">
+        <h5 class="text-body mb-1"><span class="font-weight-light">Top Rated <strong>Gadgets</strong> are on <strong>Sale</strong></span></h5><span class="text-warning font-size-sm font-weight-semibold">Shop now<i data-feather="chevron-right" style="width: 1rem; height: 1rem;"></i></span>
+      </div></a><a class="media align-items-center bg-faded-success text-decoration-0" href="#"><img class="mr-1" src="{% static 'oscar/img/home/electronics/banner-sm03.png' %}" width="125" alt="Banner">
+      <div class="media-body py-2 pr-2">
+        <h5 class="text-body mb-1"><span class="font-weight-light">Catch Big <strong>Deals</strong> on <strong>Earbuds</strong></span></h5><span class="text-success font-size-sm font-weight-semibold">Shop now<i data-feather="chevron-right" style="width: 1rem; height: 1rem;"></i></span>
+      </div></a>
+    </div>
+  </div>
+</section>
+
+
+<!-- Popular categories (carousel)-->
+<section class="pb-4">
+  <h2 class="h4 font-weight-semibold">Popular categories</h2>
+  <div class="owl-carousel" data-owl-carousel="{ &quot;nav&quot;: false, &quot;dots&quot;: true, &quot;margin&quot;: 30, &quot;responsive&quot;: {&quot;0&quot;:{&quot;items&quot;:1},&quot;460&quot;:{&quot;items&quot;:2}, &quot;768&quot;:{&quot;items&quot;:3}} }">
+    <div class="card border-0"><a class="card-img-tiles" href="{{product_query_url}}">
+        <div class="main-img"><img src="{% static '/oscar/img/shop/apparel/categories/01.jpg' %}" alt="Laptop"></div>
+        <div class="thumblist"><img src="{% static '/oscar/img/shop/apparel/categories/02.jpg' %}" alt="Laptop"><img src="{% static '/oscar/img/shop/apparel/categories/03.jpg' %}" alt="Laptop"></div></a>
+      <div class="card-body border mt-n1 py-4 text-center">
+        <h2 class="h5 mb-1">Laptop</h2><span class="d-block mb-3 font-size-xs text-muted">Starting from <span class='font-weight-semibold'>$549.99</span></span><a class="btn btn-pill btn-outline-primary btn-sm" href="#">Shop laptop</a>
+      </div>
+    </div>
+    <div class="card border-0"><a class="card-img-tiles" href="{{product_query_url}}">
+      <div class="main-img"><img src="{% static '/oscar/img/shop/apparel/categories/04.jpg' %}" alt="Phone"></div>
+      <div class="thumblist"><img src="{% static '/oscar/img/shop/apparel/categories/05.jpg' %}" alt="Phone"><img src="{% static '/oscar/img/shop/apparel/categories/06.jpg' %}" alt="Phone"></div></a>
+      <div class="card-body border mt-n1 py-4 text-center">
+        <h2 class="h5 mb-1">Smart Phone</h2><span class="d-block mb-3 font-size-xs text-muted">Starting from <span class='font-weight-semibold'>$156.00</span></span><a class="btn btn-pill btn-outline-primary btn-sm" href="#">Shop Smart Phone</a>
+      </div>
+    </div>
+    <div class="card border-0"><a class="card-img-tiles" href="{{product_query_url}}">
+      <div class="main-img"><img src="{% static '/oscar/img/shop/apparel/categories/07.jpg' %}" alt="Bags"></div>
+      <div class="thumblist"><img src="{% static '/oscar/img/shop/apparel/categories/08.jpg' %}" alt="Bags"><img src="{% static '/oscar/img/shop/apparel/categories/09.jpg' %}" alt="Bags"></div></a>
+      <div class="card-body border mt-n1 py-4 text-center">
+        <h2 class="h5 mb-1">Bags</h2><span class="d-block mb-3 font-size-xs text-muted">Starting from <span class='font-weight-semibold'>$27.00</span></span><a class="btn btn-pill btn-outline-primary btn-sm" href="#">Shop bags</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Brands carousel-->
+<section class="pt-3">
+  <h2 class="h4 font-weight-semibold">Shop by brand</h2>
+  <div class="owl-carousel" data-owl-carousel="{ &quot;nav&quot;: false, &quot;dots&quot;: true, &quot;loop&quot;: true, &quot;margin&quot;: 20, &quot;autoplay&quot;: true, &quot;autoplayTimeout&quot;: 4000, &quot;responsive&quot;: {&quot;0&quot;:{&quot;items&quot;:2, &quot;margin&quot;: 15},&quot;460&quot;:{&quot;items&quot;:3, &quot;margin&quot;: 15}, &quot;768&quot;:{&quot;items&quot;:4}} }">
+    <a class="d-block bg-white border py-3 py-sm-4" href="#"><img class="d-block mx-auto" src="{% static '/oscar/img/shop/apparel/brands/01.png' %}" style="width: 150px;" alt="Brand"></a>
+    <a class="d-block bg-white border py-3 py-sm-4" href="#"><img class="d-block mx-auto" src="{% static '/oscar/img/shop/apparel/brands/02.png' %}" style="width: 150px;" alt="Brand"></a>
+    <a class="d-block bg-white border py-3 py-sm-4" href="#"><img class="d-block mx-auto" src="{% static '/oscar/img/shop/apparel/brands/03.png' %}" style="width: 150px;" alt="Brand"></a>
+    <a class="d-block bg-white border py-3 py-sm-4" href="#"><img class="d-block mx-auto" src="{% static '/oscar/img/shop/apparel/brands/04.png' %}" style="width: 150px;" alt="Brand"></a>
+    <a class="d-block bg-white border py-3 py-sm-4" href="#"><img class="d-block mx-auto" src="{% static '/oscar/img/shop/apparel/brands/05.png' %}" style="width: 150px;" alt="Brand"></a>
+    <a class="d-block bg-white border py-3 py-sm-4" href="#"><img class="d-block mx-auto" src="{% static '/oscar/img/shop/apparel/brands/06.png' %}" style="width: 150px;" alt="Brand"></a>
+    <a class="d-block bg-white border py-3 py-sm-4" href="#"><img class="d-block mx-auto" src="{% static '/oscar/img/shop/apparel/brands/07.png' %}" style="width: 150px;" alt="Brand"></a>
+    <a class="d-block bg-white border py-3 py-sm-4" href="#"><img class="d-block mx-auto" src="{% static '/oscar/img/shop/apparel/brands/08.png' %}" style="width: 150px;" alt="Brand"></a>
+    <a class="d-block bg-white border py-3 py-sm-4" href="#"><img class="d-block mx-auto" src="{% static '/oscar/img/shop/apparel/brands/09.png' %}" style="width: 150px;" alt="Brand"></a>
+    <a class="d-block bg-white border py-3 py-sm-4" href="#"><img class="d-block mx-auto" src="{% static '/oscar/img/shop/apparel/brands/10.png' %}" style="width: 150px;" alt="Brand"></a>
+    <a class="d-block bg-white border py-3 py-sm-4" href="#"><img class="d-block mx-auto" src="{% static '/oscar/img/shop/apparel/brands/11.png' %}" style="width: 150px;" alt="Brand"></a>
+    <a class="d-block bg-white border py-3 py-sm-4" href="#"><img class="d-block mx-auto" src="{% static '/oscar/img/shop/apparel/brands/12.png' %}" style="width: 150px;" alt="Brand"></a>
+  </div>
+</section>

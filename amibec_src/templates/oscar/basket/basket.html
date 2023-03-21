@@ -1,0 +1,46 @@
+{% extends "oscar/layout.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% trans "Basket" %} | {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ homepage_url }}">{% trans "Home" %}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{% trans "Basket" %}</li>
+        </ol>
+    </nav>
+{% endblock %}
+
+{# Hide mini-basket so we don't have two baskets to keep in sync #}
+{% block mini_basket %}{% endblock %}
+
+{% block headertext %}
+    {% trans "Basket" %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xl-9 col-md-9 col-sm-9">
+            {# Use a partial template so that AJAX can be used to re-render basket #}
+            {% include 'oscar/basket/partials/basket_content.html' %}
+        </div>
+        <div class="col-xl-3 col-md-3 col-sm-3 pt-3 pt-md-0">
+            <div class="">
+                {% include "oscar/basket/partials/order_items_summary_total.html" %}
+            </div>       
+            {% include "oscar/basket/partials/order_items_summary.html" %}
+        </div>
+    </div>
+{% endblock content %}
+
+{% block onbodyload %}
+    {{ block.super }}
+    {# We pass in the URL to send AJAX requests to #}
+    var options = {
+        'basketURL': '{% url 'basket:summary' %}'
+    };
+    oscar.basket.init(options);
+{% endblock %}

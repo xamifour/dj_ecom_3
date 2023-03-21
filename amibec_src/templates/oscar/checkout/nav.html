@@ -1,0 +1,48 @@
+{% load i18n %}
+
+<div class="steps">
+    <div class="steps-header">
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+    </div>
+
+    <div class="steps-body">
+    {% spaceless %}
+
+        {% if step == 2 or step == 3 or step == 4 %}
+            <a href="{% url 'checkout:shipping-address' %}" class="step has-indicator step-completed step1 {% if step == 1 %}active{% else %}{% if step == 2 %}previous{% else %}{% if step > 1 %}visited{% else %}disabled{% endif %}{% endif %}{% endif %}">
+                <span class="step-indicator"><i data-feather="check"></i></span>
+                {% trans "Shipping address" %}
+            </a>
+        {% else %}
+            <span class="step-indicator"><i data-feather="check"></i></span>
+                {%  trans "Shipping address" %}
+        {% endif %}
+    
+        {% if step == 3 or step == 4 %}
+            <a href="{% url 'checkout:shipping-method' %}" class="step has-indicator step2 {% if step == 2 %}active{% else %}{% if step == 3 %}previous{% else %}{% if step > 2 %}visited{% else %}disabled{% endif %}{% endif %}{% endif %}">
+                <span class="step-indicator">2</span>{% trans "Shipping method" %}
+            </a>
+        {% else %}
+            <span class="step-indicator">2</span>{% trans "Shipping method" %}
+        {% endif %}
+    
+        {% if step == 4 %}
+            <a href="{% url 'checkout:payment-details' %}" class="step has-indicator step3 {% if step == 3 %}active{% else %}{% if step == 4 %}previous{% else %}{% if step > 3 %}visited{% else %}disabled{% endif %}{% endif %}{% endif %}">
+                <span class="step-indicator">3</span>{% trans "Payment" %}
+            </a>
+        {% else %}
+            <span class="step-indicator">3</span>{%  trans "Payment" %}
+        {% endif %}
+    
+        <a class="step has-indicator step4 {% if step == 4 %}active{% else %}disabled{% endif %} ">
+            <span class="step-indicator">4</span>{% trans "Preview" %}
+        </a>
+
+        <a class="step has-indicator step5 {% if step == 5 %}active{% else %}disabled{% endif %} ">
+            <span class="step-indicator">5</span> {% trans "Confirmation" %}
+        </a>
+    {% endspaceless %}
+    </div>
+</div>
